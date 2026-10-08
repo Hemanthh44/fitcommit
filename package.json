@@ -1,0 +1,13 @@
+{
+  "name": "fitcommit-workspace",
+  "version": "1.0.0",
+  "description": "FitCommit - Production-Ready Smart Gym & AI Fitness Architecture",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build": "npm --prefix client run build",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server start",
+    "test": "npm --prefix server test"
+  }
+}

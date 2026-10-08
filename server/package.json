@@ -1,0 +1,25 @@
+{
+  "name": "fitcommit-server",
+  "version": "1.0.0",
+  "description": "FitCommit Backend API - Production-Ready Smart Gym & Fitness Tracking System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test_occupancy_realtime.js && node test_recommendations.js",
+    "test:pg": "node test_pg_connection.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.27.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.4.0",
+    "pg": "^8.11.5"
+  }
+}
