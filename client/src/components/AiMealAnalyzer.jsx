@@ -174,6 +174,50 @@ export default function AiMealAnalyzer({ onMealSaved }) {
     if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
+  // Helper to downscale large mobile camera photos before upload
+  const compressImageBeforeUpload = async (file) => {
+    if (!file || file.size < 1024 * 1024) return file;
+    try {
+      return await new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const maxDim = 1600;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(file);
+        };
+        img.src = url;
+      });
+    } catch {
+      return file;
+    }
+  };
+
   // Trigger AI Vision + Deterministic Nutrition Analysis
   const handleAnalyzeMeal = async () => {
     if (!selectedFile) return;
@@ -182,8 +226,9 @@ export default function AiMealAnalyzer({ onMealSaved }) {
     setErrorMsg('');
     setAnalysisResult(null);
 
+    const fileToUpload = await compressImageBeforeUpload(selectedFile);
     const formData = new FormData();
-    formData.append('image', selectedFile);
+    formData.append('image', fileToUpload);
 
     try {
       const data = await api.analyzeMeal(formData);
@@ -208,7 +253,10 @@ export default function AiMealAnalyzer({ onMealSaved }) {
       }
     } catch (err) {
       console.error('Analyze Meal Error:', err);
-      const serverMessage = err.data?.message || err.data?.error || err.message;
+      let serverMessage = err.data?.message || err.data?.error || err.message;
+      if (err.message === 'Failed to fetch' || err.message?.includes('NetworkError') || !err.status) {
+        serverMessage = "Could not connect to the backend server. If your backend is hosted on Render free tier, it may take 40-50 seconds to wake from sleep. Also check that your VITE_API_URL and CORS settings are configured correctly.";
+      }
       setErrorMsg(
         serverMessage || "AI food recognition failed. Try uploading a clearer photo or enter your meal items manually."
       );

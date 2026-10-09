@@ -95,7 +95,7 @@ function applyPortionSanityCheck(food) {
 /**
  * Helper to call Gemini models with a strict per-attempt timeout to prevent indefinite hangs
  */
-async function callModelWithTimeout(ai, modelName, contents, config, timeoutMs = 8000) {
+async function callModelWithTimeout(ai, modelName, contents, config, timeoutMs = 15000) {
   let timer;
   const timeoutPromise = new Promise((_, reject) => {
     timer = setTimeout(() => {
@@ -211,7 +211,7 @@ Return strict JSON conforming to this schema:
         {
           responseMimeType: 'application/json'
         },
-        7500 // 7.5s strict timeout per candidate model
+        15000 // 15s strict timeout per candidate model
       );
 
       const text = response.text?.trim();
@@ -345,7 +345,7 @@ Return strict JSON conforming to this schema:
         {
           responseMimeType: 'application/json'
         },
-        6000 // 6s fast verification timeout
+        10000 // 10s fast verification timeout
       );
 
       const text = response.text?.trim();

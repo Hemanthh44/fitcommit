@@ -30,30 +30,46 @@ if (process.env.FRONTEND_URL) {
 }
 
 // In local development, always allow common localhost origins
-if (!isProduction) {
-  allowedOrigins.push('http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://127.0.0.1:3000');
-}
+allowedOrigins.push(
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5000'
+);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow server-to-server, mobile app, Postman, or curl requests with no origin
+    // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
 
-    if (!isProduction) {
-      // In development, allow localhost or explicitly declared origin
+    const cleanOrigin = origin.replace(/\/$/, '');
+
+    // Allow in dev mode or localhost
+    if (!isProduction || cleanOrigin.includes('localhost') || cleanOrigin.includes('127.0.0.1')) {
       return callback(null, true);
     }
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Automatically allow any Vercel deployment (preview or production) or Render domain
+    try {
+      const urlObj = new URL(cleanOrigin);
+      if (urlObj.hostname.endsWith('.vercel.app') || urlObj.hostname.endsWith('.onrender.com')) {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // ignore URL parsing error
+    }
+
+    if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
       console.warn(`[CORS Blocked] Request origin: ${origin} not in allowed list: ${allowedOrigins.join(', ')}`);
-      return callback(new Error('Not allowed by FitCommit CORS Policy'));
+      return callback(null, false);
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 
 // 3. Body Parser
