@@ -130,8 +130,9 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// 6. Application API Routes
+// 6. Application API Routes (supports both /api/* and /* for seamless client routing)
 app.use('/api', apiRoutes);
+app.use(apiRoutes);
 
 // 7. 404 Route Handler
 app.use((req, res, next) => {

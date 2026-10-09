@@ -10,13 +10,14 @@
 export const API_BASE_URL = (() => {
   // If an explicit external production API URL is set (not localhost:5000), use it
   if (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes('localhost:5000')) {
-    const custom = import.meta.env.VITE_API_URL.replace(/\/$/, '');
+    let custom = import.meta.env.VITE_API_URL.trim().replace(/\/$/, '');
     if (custom.startsWith('http://') || custom.startsWith('https://')) {
-      return custom;
+      return custom.endsWith('/api') ? custom : `${custom}/api`;
     }
     // If relative path like '/api'
     if (typeof window !== 'undefined') {
-      return `${window.location.origin}${custom.startsWith('/') ? '' : '/'}${custom}`;
+      const pathPart = custom.endsWith('/api') ? custom : (custom ? `${custom}/api` : '/api');
+      return `${window.location.origin}${pathPart.startsWith('/') ? '' : '/'}${pathPart}`;
     }
   }
 
