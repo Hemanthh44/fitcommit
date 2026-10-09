@@ -14,11 +14,13 @@ import {
   QrCode
 } from 'lucide-react';
 
-export default function Navbar({ activePage, setActivePage }) {
+export default function Navbar({ activePage, setActivePage, mobileMenuOpen: externalOpen, setMobileMenuOpen: externalSetOpen }) {
   const { user, isPremium, isAdmin, logout, demoLogin } = useAuth();
   const { unreadCount } = useNotifications();
   const { toggleTheme, isDark } = useTheme();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const mobileMenuOpen = typeof externalOpen !== 'undefined' ? externalOpen : internalOpen;
+  const setMobileMenuOpen = typeof externalSetOpen !== 'undefined' ? externalSetOpen : setInternalOpen;
   const [personaOpen, setPersonaOpen] = useState(false);
 
   const handleNav = (page) => {
@@ -196,7 +198,7 @@ export default function Navbar({ activePage, setActivePage }) {
                   </div>
 
                   {/* User Info Label */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', lineHeight: 1.2 }}>
+                  <div className="hide-on-mobile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', lineHeight: 1.2 }}>
                     <span style={{
                       fontFamily: 'var(--font-display)',
                       fontWeight: 700,

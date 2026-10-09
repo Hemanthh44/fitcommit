@@ -5,6 +5,7 @@ import { NotificationProvider } from './context/NotificationContext';
 
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 
 import Landing from './pages/Landing';
@@ -41,6 +42,7 @@ function MainRouter() {
   };
 
   const [activePage, setActivePage] = useState(getInitialPage);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // If user logs in, preserve pending QR checkin or redirect to dashboard
   useEffect(() => {
@@ -136,12 +138,17 @@ function MainRouter() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar activePage={activePage} setActivePage={setActivePage} />
+      <Navbar 
+        activePage={activePage} 
+        setActivePage={setActivePage} 
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+      />
       
       {isAuthDashboard ? (
         <div className="app-shell">
           <Sidebar activePage={activePage} setActivePage={setActivePage} />
-          <main style={{ flex: 1, minWidth: 0, paddingBottom: '60px' }}>
+          <main className="app-main-content" style={{ flex: 1, minWidth: 0, paddingBottom: '76px' }}>
             {renderCurrentPage()}
           </main>
         </div>
@@ -149,6 +156,14 @@ function MainRouter() {
         <main style={{ flex: 1 }}>
           {renderCurrentPage()}
         </main>
+      )}
+
+      {isAuthDashboard && (
+        <BottomNav 
+          activePage={activePage} 
+          setActivePage={setActivePage} 
+          onOpenMenu={() => setMobileMenuOpen(prev => !prev)} 
+        />
       )}
 
       <Footer setActivePage={setActivePage} />

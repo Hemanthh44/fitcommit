@@ -1100,7 +1100,7 @@ export default function AiMealAnalyzer({ onMealSaved }) {
             </div>
 
             {/* Meal Type Selector Pill Group */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{ fontSize: '0.80rem', fontWeight: 600, color: '#505A69' }}>Meal Slot:</span>
               {['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'].map((slot) => (
                 <button
